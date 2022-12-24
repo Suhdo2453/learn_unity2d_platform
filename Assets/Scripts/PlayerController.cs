@@ -23,6 +23,10 @@ public class PlayerController : MonoBehaviour
     int groundMask;
     int currentAttack = 0;
 
+    bool isWallTouch;
+    bool isSliding;
+    public float wallSlidingSpeed;
+
     Sensor l1_sensor;
     Sensor l2_sensor;
     Sensor r1_sensor;
@@ -36,6 +40,7 @@ public class PlayerController : MonoBehaviour
     const string PLAYER_ATTACK_3 = "attact3";
     const string PLAYER_JUMP = "jump";
     const string PLAYER_FALL = "fall";
+    const string PLAYER_WALL_TOUCH = "sliding";
 
     // Start is called before the first frame update
     void Start()
@@ -53,6 +58,7 @@ public class PlayerController : MonoBehaviour
     {
         CheckMoveState();
         CheckIsGround();
+        CheckWallTouch();
     }
 
     private void FixedUpdate()
@@ -80,10 +86,19 @@ public class PlayerController : MonoBehaviour
             isJumping = false;
         }
 
-        if(isGrounded && !l2_sensor.State() && !r2_sensor.State())
+        if(isGrounded && (!l2_sensor.State() || !r2_sensor.State()))
         {
             isGrounded = false;
         }
+    }
+
+    void CheckWallTouch()
+    {
+        if (yVeloci < 0 && xAxis != 0 && ((l1_sensor.State() && l2_sensor.State()) || (r1_sensor.State() && r2_sensor.State())))
+        {
+            isWallTouch = true;
+        }
+        else isWallTouch = false;
     }
 
     void CheckMoveState()
@@ -148,6 +163,17 @@ public class PlayerController : MonoBehaviour
             ChangeAnimation(PLAYER_JUMP);
         }
         else if(!l2_sensor.State() && !r2_sensor.State() && yVeloci < 0)
+        {
+            ChangeAnimation(PLAYER_FALL);
+        }
+
+        //Wall touch
+        if (isWallTouch && !isGrounded)
+        {
+            rb2d.velocity = new Vector2(rb2d.velocity.x, Mathf.Clamp(rb2d.velocity.y, -wallSlidingSpeed, float.MaxValue));
+            ChangeAnimation(PLAYER_WALL_TOUCH);
+        }
+        else if (!isGrounded && ((l1_sensor.State() && l2_sensor.State()) || (r1_sensor.State() && r2_sensor.State())))
         {
             ChangeAnimation(PLAYER_FALL);
         }
