@@ -20,7 +20,6 @@ public class PlayerController : MonoBehaviour
     bool isGrounded;
     float xAxis;
     float yVeloci;
-    int groundMask;
     int currentAttack = 0;
 
     bool isWallTouch;
