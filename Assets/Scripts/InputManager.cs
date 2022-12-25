@@ -21,7 +21,7 @@ public class InputManager : MonoBehaviour
         InputManager.instance = this;
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
         this.GetHorizontalState();
         this.CheckJumpKeyPress();
