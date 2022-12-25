@@ -37,7 +37,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Awake()
     {
-        if (PlayerMovement.instance != null) Debug.Log("Only 1 PlayerMovement allow to exsis!");
+        if (PlayerMovement.instance != null) Debug.LogError("Only 1 PlayerMovement allow to exsis!");
         PlayerMovement.instance = this;
     }
 
@@ -93,7 +93,7 @@ public class PlayerMovement : MonoBehaviour
 
     protected virtual void Move()
     {
-        if (InputManager.Instance.HorizontalState == 0) return;
+        if (InputManager.Instance.HorizontalState == 0 || PlayerAttacking.Instance.IsAttacking) return;
 
         transform.parent.Translate(InputManager.Instance.HorizontalState * moveSpeed * Time.deltaTime, 0f, 0f);
         Flip();

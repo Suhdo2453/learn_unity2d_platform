@@ -20,9 +20,10 @@ public class PlayerAnimation : MonoBehaviour
 
     private void FixedUpdate()
     {
-       this.Run();
-       this.Jump();
-       this.Slide();
+        this.Run();
+        this.Jump();
+        this.Slide();
+        this.Attack();
     }
 
     protected virtual void ChangeAnimation(string newAnimation)
@@ -34,7 +35,7 @@ public class PlayerAnimation : MonoBehaviour
 
     protected virtual void Run()
     {
-        if (!PlayerMovement.Instance.IsGrounded) return;
+        if (!PlayerMovement.Instance.IsGrounded || PlayerAttacking.Instance.IsAttacking) return;
 
         if (InputManager.Instance.HorizontalState != 0)
             ChangeAnimation(PLAYER_RUN);
@@ -53,5 +54,11 @@ public class PlayerAnimation : MonoBehaviour
         if (!PlayerMovement.Instance.IsSliding) return;
        
         ChangeAnimation(PLAYER_SLIDE);
+    }
+
+    protected virtual void Attack()
+    {
+        if (!PlayerAttacking.Instance.IsAttacking) return;
+        ChangeAnimation("attact" + PlayerAttacking.Instance.CurrentAttack);
     }
 }

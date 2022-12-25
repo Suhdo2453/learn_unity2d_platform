@@ -25,6 +25,10 @@ public class InputManager : MonoBehaviour
     {
         this.GetHorizontalState();
         this.CheckJumpKeyPress();
+    }
+
+    private void FixedUpdate()
+    {
         this.CheckAttackKeyPress();
     }
 
@@ -41,6 +45,7 @@ public class InputManager : MonoBehaviour
 
     protected virtual void CheckAttackKeyPress()
     {
-        this.attackKeyPress = Input.GetMouseButtonDown(0);
+        if (Input.GetAxisRaw("Fire1") > 0) this.attackKeyPress = true;
+        else this.attackKeyPress = false;
     }
 }
