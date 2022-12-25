@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Sensor : MonoBehaviour
 {
+    [SerializeField]
     bool isActive;
 
     private void OnEnable()
@@ -30,6 +31,7 @@ public class Sensor : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if(collision.gameObject.layer == 6)
         isActive = true;
     }
 

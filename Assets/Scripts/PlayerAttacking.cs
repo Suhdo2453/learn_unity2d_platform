@@ -7,6 +7,7 @@ public class PlayerAttacking : MonoBehaviour
     private static PlayerAttacking instance;
     [SerializeField] private bool isAttacking;
     [SerializeField] private int currentAttack;
+    [SerializeField] private GameObject attackHitBox;
 
     public bool IsAttacking { get => isAttacking; set => isAttacking = value; }
     public int CurrentAttack { get => currentAttack; set => currentAttack = value; }
@@ -16,6 +17,11 @@ public class PlayerAttacking : MonoBehaviour
     {
         if (PlayerAttacking.instance != null) Debug.LogError("Only 1 PlayerAttacking allow to exsis!");
         PlayerAttacking.instance = this;
+    }
+
+    private void Start()
+    {
+        attackHitBox.SetActive(false);
     }
 
     private void FixedUpdate()
@@ -34,12 +40,15 @@ public class PlayerAttacking : MonoBehaviour
             currentAttack++;
             if (currentAttack > 3) currentAttack = 1;
             isAttacking = true;
-            Invoke("ResetAttack", 0.5f);
+            StartCoroutine(DoAttack());
         }
     }
 
-    protected virtual void ResetAttack()
+    IEnumerator DoAttack()
     {
+        attackHitBox.SetActive(true);
+        yield return new WaitForSeconds(0.5f); //Sau khoang thoi gian trong () se thuc hien code ben duoi
+        attackHitBox.SetActive(false);
         isAttacking = false;
     }
 }
