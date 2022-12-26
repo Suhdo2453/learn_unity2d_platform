@@ -6,6 +6,8 @@ public class PlayerAnimation : MonoBehaviour
 {
     [SerializeField] protected string currentAnimation;
     [SerializeField] protected Animator animator;
+    [SerializeField] protected PlayerState playerState;
+    Vector3 objectScale;
 
     const string PLAYER_RUN = "run";
     const string PLAYER_IDLE = "idle";
@@ -15,7 +17,8 @@ public class PlayerAnimation : MonoBehaviour
 
     private void Start()
     {
-        animator = GetComponent<Animator>();
+        this.animator = GetComponent<Animator>();
+        this.playerState = transform.parent.GetComponent<PlayerState>();
     }
 
     private void FixedUpdate()
@@ -24,6 +27,7 @@ public class PlayerAnimation : MonoBehaviour
         this.Jump();
         this.Slide();
         this.Attack();
+        this.Flip();
     }
 
     protected virtual void ChangeAnimation(string newAnimation)
@@ -35,7 +39,7 @@ public class PlayerAnimation : MonoBehaviour
 
     protected virtual void Run()
     {
-        if (!PlayerMovement.Instance.IsGrounded || PlayerAttacking.Instance.IsAttacking) return;
+        if (!playerState.isGrounded || PlayerAttacking.Instance.IsAttacking) return;
 
         if (InputManager.Instance.HorizontalState != 0)
             ChangeAnimation(PLAYER_RUN);
@@ -44,14 +48,14 @@ public class PlayerAnimation : MonoBehaviour
 
     protected virtual void Jump()
     {
-        if (PlayerMovement.Instance.IsGrounded) return;
-        if (PlayerMovement.Instance.IsJumping) ChangeAnimation(PLAYER_JUMP);
-        if (PlayerMovement.Instance.IsFalling) ChangeAnimation(PLAYER_FALL);
+        if (playerState.isGrounded || playerState.isSliding) return;
+        if (playerState.isJumping) ChangeAnimation(PLAYER_JUMP);
+        if (playerState.isFalling) ChangeAnimation(PLAYER_FALL);
     }
 
     protected virtual void Slide()
     {
-        if (!PlayerMovement.Instance.IsSliding) return;
+        if (!playerState.isSliding) return;
        
         ChangeAnimation(PLAYER_SLIDE);
     }
@@ -60,5 +64,22 @@ public class PlayerAnimation : MonoBehaviour
     {
         if (!PlayerAttacking.Instance.IsAttacking) return;
         ChangeAnimation("attact" + PlayerAttacking.Instance.CurrentAttack);
+    }
+
+    protected virtual void Flip()
+    {
+        if (PlayerAttacking.Instance.IsAttacking) return;
+        objectScale = transform.parent.localScale;
+
+        if (InputManager.Instance.HorizontalState < 0 && objectScale.x > 0)
+        {
+            objectScale.x *= -1;
+        }
+        else if (InputManager.Instance.HorizontalState > 0 && objectScale.x < 0)
+        {
+            objectScale.x *= -1;
+        }
+
+        transform.parent.localScale = objectScale;
     }
 }

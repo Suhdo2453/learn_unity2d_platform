@@ -5,6 +5,8 @@ using UnityEngine;
 public class PlayerAttacking : MonoBehaviour
 {
     private static PlayerAttacking instance;
+
+    [SerializeField] protected PlayerState playerState;
     [SerializeField] private bool isAttacking;
     [SerializeField] private int currentAttack;
     [SerializeField] private GameObject attackHitBox;
@@ -21,6 +23,7 @@ public class PlayerAttacking : MonoBehaviour
 
     private void Start()
     {
+        playerState = transform.parent.GetComponent<PlayerState>();
         attackHitBox.SetActive(false);
     }
 
@@ -32,9 +35,9 @@ public class PlayerAttacking : MonoBehaviour
     protected virtual void Attack()
     {
         if (!InputManager.Instance.AttackKeyPress ||
-            PlayerMovement.Instance.IsSliding ||
-            PlayerMovement.Instance.IsJumping ||
-            PlayerMovement.Instance.IsFalling) return;
+            playerState.isSliding ||
+            playerState.isJumping ||
+            playerState.isFalling) return;
         if (!isAttacking)
         {
             currentAttack++;
