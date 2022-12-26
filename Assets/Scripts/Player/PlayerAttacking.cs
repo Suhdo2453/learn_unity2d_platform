@@ -4,22 +4,11 @@ using UnityEngine;
 
 public class PlayerAttacking : MonoBehaviour
 {
-    private static PlayerAttacking instance;
 
     [SerializeField] protected PlayerState playerState;
-    [SerializeField] private bool isAttacking;
-    [SerializeField] private int currentAttack;
-    [SerializeField] private GameObject attackHitBox;
-
-    public bool IsAttacking { get => isAttacking; set => isAttacking = value; }
-    public int CurrentAttack { get => currentAttack; set => currentAttack = value; }
-    public static PlayerAttacking Instance { get => instance; }
-
-    private void Awake()
-    {
-        if (PlayerAttacking.instance != null) Debug.LogError("Only 1 PlayerAttacking allow to exsis!");
-        PlayerAttacking.instance = this;
-    }
+    [SerializeField] internal bool isAttacking;
+    [SerializeField] internal int currentAttack;
+    [SerializeField] internal GameObject attackHitBox;
 
     private void Start()
     {

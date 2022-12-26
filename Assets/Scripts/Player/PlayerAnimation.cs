@@ -39,7 +39,7 @@ public class PlayerAnimation : MonoBehaviour
 
     protected virtual void Run()
     {
-        if (!playerState.isGrounded || PlayerAttacking.Instance.IsAttacking) return;
+        if (!playerState.isGrounded || playerState.playerAttacking.isAttacking) return;
 
         if (InputManager.Instance.HorizontalState != 0)
             ChangeAnimation(PLAYER_RUN);
@@ -62,13 +62,13 @@ public class PlayerAnimation : MonoBehaviour
 
     protected virtual void Attack()
     {
-        if (!PlayerAttacking.Instance.IsAttacking) return;
-        ChangeAnimation("attact" + PlayerAttacking.Instance.CurrentAttack);
+        if (!playerState.playerAttacking.isAttacking) return;
+        ChangeAnimation("attact" + playerState.playerAttacking.currentAttack);
     }
 
     protected virtual void Flip()
     {
-        if (PlayerAttacking.Instance.IsAttacking) return;
+        if (playerState.playerAttacking.isAttacking) return;
         objectScale = transform.parent.localScale;
 
         if (InputManager.Instance.HorizontalState < 0 && objectScale.x > 0)

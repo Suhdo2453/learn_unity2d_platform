@@ -16,26 +16,11 @@ public class PlayerMovement : MonoBehaviour
         this.Jump();
         this.Move();
         this.Slide();
-        this.CheckIsGround();
-    }
-
-    protected virtual void CheckIsGround()
-    {
-        if (!playerState.isGrounded && playerState.l2_sensor.State() && playerState.r2_sensor.State())
-        {
-            playerState.isGrounded = true;
-            playerState.isJumping = false;
-        }
-
-        if (playerState.isGrounded && (!playerState.l2_sensor.State() || !playerState.r2_sensor.State()))
-        {
-            playerState.isGrounded = false;
-        }
     }
 
     protected virtual void Move()
     {
-        if (InputManager.Instance.HorizontalState == 0 || PlayerAttacking.Instance.IsAttacking) return;
+        if (InputManager.Instance.HorizontalState == 0 || playerState.playerAttacking.isAttacking) return;
 
         transform.parent.Translate(InputManager.Instance.HorizontalState * playerState.moveSpeed * Time.fixedDeltaTime, 0f, 0f);
     }
@@ -43,7 +28,7 @@ public class PlayerMovement : MonoBehaviour
 
     protected virtual void Jump()
     {
-        if (!playerState.isGrounded) return;
+        if (!playerState.isGrounded || playerState.playerAttacking.isAttacking) return;
 
         if (InputManager.Instance.JumpKeyPress && playerState.yVelocity == 0)
         {
