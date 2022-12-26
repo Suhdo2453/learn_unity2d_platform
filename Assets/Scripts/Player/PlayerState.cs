@@ -11,6 +11,7 @@ public class PlayerState : ObjectState
     public float timeSiceAttack2 = 0.5f;
     public float timeSiceAttack3 = 0.5f;
     public float wallSlidingSpeed = 2f;
+    public float wallJumpTime = 0.08f;
 
     [SerializeField] internal Rigidbody2D rb;
     [SerializeField] protected BoxCollider2D boxCollider2d;
@@ -24,6 +25,7 @@ public class PlayerState : ObjectState
     [SerializeField] internal PlayerAttacking playerAttacking;
     [SerializeField] internal PlayerAnimation playerAnimation;
     [SerializeField] internal PlayerMovement playerMovement;
+    
 
     private void Start()
     {
@@ -47,7 +49,7 @@ public class PlayerState : ObjectState
 
     protected virtual void CheckIsGround()
     {
-        RaycastHit2D raycastHit = Physics2D.BoxCast(boxCollider2d.bounds.center, 
+        RaycastHit2D raycastHit = Physics2D.BoxCast(boxCollider2d.bounds.center,
                                     new Vector2(boxCollider2d.bounds.size.x - 0.1f, boxCollider2d.bounds.size.y),
                                     0f, Vector2.down, 0.1f, layerMask);
         if (raycastHit.collider != null)
@@ -65,6 +67,7 @@ public class PlayerState : ObjectState
     {
         if (yVelocity >= 0 || isGrounded || !r1_sensor.State())
         {
+            Invoke("ResetWallJump", wallJumpTime);
             isSliding = false;
             return false;
         }
@@ -72,11 +75,17 @@ public class PlayerState : ObjectState
         if (InputManager.Instance.HorizontalState != 0)
         {
             isSliding = true;
+            canWallJump = true;
             isFalling = false;
         }
         else isSliding = false;
 
         return this.isSliding;
+    }
+
+    protected virtual void ResetWallJump()
+    {
+        canWallJump = false;
     }
 
     protected virtual void CheckJumpOrFall()

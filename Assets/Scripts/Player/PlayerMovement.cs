@@ -5,6 +5,8 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] protected PlayerState playerState;
+    [SerializeField] protected float xWallJump = 6.5f;
+    [SerializeField] protected float yWallJump = 100f;
 
     private void Start()
     {
@@ -14,14 +16,14 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         this.Jump();
+        this.WallJump();
         this.Move();
         this.Slide();
     }
 
     protected virtual void Move()
     {
-        if (InputManager.Instance.HorizontalState == 0 || playerState.playerAttacking.isAttacking) return;
-
+        if (InputManager.Instance.HorizontalState == 0 || playerState.playerAttacking.isAttacking || playerState.canWallJump) return;
         transform.parent.Translate(InputManager.Instance.HorizontalState * playerState.moveSpeed * Time.fixedDeltaTime, 0f, 0f);
     }
 
@@ -29,10 +31,19 @@ public class PlayerMovement : MonoBehaviour
     protected virtual void Jump()
     {
         if (!playerState.isGrounded || playerState.playerAttacking.isAttacking) return;
-
         if (InputManager.Instance.JumpKeyPress && playerState.yVelocity == 0)
         {
             playerState.rb.AddForce(new Vector2(0, playerState.jumpForce));
+        }
+    }
+
+    protected virtual void WallJump()
+    {
+        if (!playerState.canWallJump) return;
+        if (InputManager.Instance.JumpKeyPress)
+        {
+            transform.parent.Translate(xWallJump * -InputManager.Instance.HorizontalState * Time.fixedDeltaTime, 0f, 0f);
+            playerState.rb.AddForce(new Vector2(0, yWallJump));
         }
     }
 
