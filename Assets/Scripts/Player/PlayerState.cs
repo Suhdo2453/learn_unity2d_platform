@@ -74,13 +74,9 @@ public class PlayerState : ObjectState
             return false;
         }
 
-        if (InputManager.Instance.HorizontalState != 0)
-        {
             isSliding = true;
             canWallJump = true;
             isFalling = false;
-        }
-        else isSliding = false;
 
         return this.isSliding;
     }

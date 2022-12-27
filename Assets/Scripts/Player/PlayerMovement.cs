@@ -7,6 +7,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] protected PlayerState playerState;
     [SerializeField] protected float xWallJump = 6.5f;
     [SerializeField] protected float yWallJump = 100f;
+    private float xStartWallJump = 0f;
+    private float xDistWallJump = 0f;
+    private bool limitVelOnWallJump;
 
     private void Start()
     {
@@ -17,6 +20,7 @@ public class PlayerMovement : MonoBehaviour
     {
         this.Jump();
         this.WallJump();
+        this.LimitWallJump();
         this.Move();
         this.Slide();
     }
@@ -44,8 +48,30 @@ public class PlayerMovement : MonoBehaviour
         if (!playerState.canWallJump) return;
         if (InputManager.Instance.JumpKeyPress)
         {
-            transform.Translate(xWallJump * -InputManager.Instance.HorizontalState * Time.fixedDeltaTime, 0f, 0f);
-            playerState.rb.AddForce(new Vector2(0, yWallJump));
+            //transform.Translate(xWallJump * -InputManager.Instance.HorizontalState * Time.fixedDeltaTime, 0f, 0f);
+            //playerState.rb.AddForce(new Vector2(0, yWallJump));
+            playerState.rb.velocity = new Vector2(0f, 0f);
+            playerState.rb.AddForce(new Vector2(-transform.localScale.x * xWallJump, yWallJump));
+            xStartWallJump = playerState.rb.position.x;
+            limitVelOnWallJump = true;
+        }
+    }
+
+    protected virtual void LimitWallJump()
+    {
+        if (!limitVelOnWallJump) return;
+
+        xDistWallJump = (xStartWallJump - transform.position.x) * transform.localScale.x;
+
+        if (xDistWallJump < -3f)
+        {
+            limitVelOnWallJump = false;
+            playerState.rb.velocity = new Vector2(0, playerState.rb.velocity.y);
+        }
+        else if (xDistWallJump > 1.5f)
+        {
+            limitVelOnWallJump = false;
+            playerState.rb.velocity = new Vector2(0, playerState.rb.velocity.y);
         }
     }
 
