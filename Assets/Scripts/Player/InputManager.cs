@@ -9,11 +9,13 @@ public class InputManager : MonoBehaviour
     [SerializeField] protected float horizontalState;
     [SerializeField] protected bool jumpKeyPress;
     [SerializeField] protected bool attackKeyPress;
+    [SerializeField] private bool blockKeyPress;
 
     public static InputManager Instance { get => instance;}
     public float HorizontalState { get => horizontalState;}
     public bool JumpKeyPress { get => jumpKeyPress;}
     public bool AttackKeyPress { get => attackKeyPress;}
+    public bool BlockKeyPress { get => blockKeyPress;}
 
     private void Awake()
     {
@@ -30,6 +32,7 @@ public class InputManager : MonoBehaviour
     private void FixedUpdate()
     {
         this.CheckAttackKeyPress();
+        this.CheckBlockKeyPress();
     }
 
     protected virtual void GetHorizontalState()
@@ -39,13 +42,19 @@ public class InputManager : MonoBehaviour
 
     protected virtual void CheckJumpKeyPress()
     {
-        if (Input.GetAxisRaw("Jump") > 0) this.jumpKeyPress = true;
+        if (Input.GetKey(KeyCode.Space)) this.jumpKeyPress = true;
         else this.jumpKeyPress = false;
     }
 
     protected virtual void CheckAttackKeyPress()
     {
-        if (Input.GetAxisRaw("Fire1") > 0) this.attackKeyPress = true;
+        if (Input.GetKey(KeyCode.Mouse0)) this.attackKeyPress = true;
         else this.attackKeyPress = false;
+    }
+
+    protected virtual void CheckBlockKeyPress()
+    {
+        if (Input.GetKey(KeyCode.Mouse1)) this.blockKeyPress = true;
+        else this.blockKeyPress = false;
     }
 }

@@ -6,7 +6,7 @@ public class PlayerState : ObjectState
 {
 
     public float moveSpeed = 5f;
-    public float jumpForce = 600f;
+    public float jumpForce = 300f;
     public float timeSiceAttack1 = 0.4f;
     public float timeSiceAttack2 = 0.5f;
     public float timeSiceAttack3 = 0.5f;
@@ -25,15 +25,17 @@ public class PlayerState : ObjectState
     [SerializeField] internal PlayerAttacking playerAttacking;
     [SerializeField] internal PlayerAnimation playerAnimation;
     [SerializeField] internal PlayerMovement playerMovement;
+    [SerializeField] internal PlayerBlock playerBlock;
     
 
     private void Start()
     {
         r1_sensor = transform.Find("R1_Sensor").GetComponent<Sensor>();
 
-        playerMovement = transform.Find("PlayerMovement").GetComponent<PlayerMovement>();
+        playerMovement = transform.GetComponent<PlayerMovement>();
         playerAnimation = transform.Find("Model").GetComponent<PlayerAnimation>();
-        playerAttacking = transform.Find("PlayerAttacking").GetComponent<PlayerAttacking>();
+        playerAttacking = transform.GetComponent<PlayerAttacking>();
+        playerBlock = transform.GetComponent<PlayerBlock>();
 
         rb = transform.GetComponent<Rigidbody2D>();
         boxCollider2d = transform.GetComponent<BoxCollider2D>();

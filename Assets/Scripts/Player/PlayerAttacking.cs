@@ -9,10 +9,12 @@ public class PlayerAttacking : MonoBehaviour
     [SerializeField] internal bool isAttacking;
     [SerializeField] internal int currentAttack;
     [SerializeField] internal GameObject attackHitBox;
+    [SerializeField] internal float attackTime = 0.5f;
+    protected float attackTime1;
 
     private void Start()
     {
-        playerState = transform.parent.GetComponent<PlayerState>();
+        playerState = transform.GetComponent<PlayerState>();
         attackHitBox.SetActive(false);
     }
 
@@ -39,7 +41,9 @@ public class PlayerAttacking : MonoBehaviour
     IEnumerator DoAttack()
     {
         attackHitBox.SetActive(true);
-        yield return new WaitForSeconds(0.5f); //Sau khoang thoi gian trong () se thuc hien code ben duoi
+        if (currentAttack == 1) attackTime1 = attackTime - 0.2f;
+        yield return new WaitForSeconds(attackTime1); //Sau khoang thoi gian trong () se thuc hien code ben duoi
+        attackTime1 = attackTime;
         attackHitBox.SetActive(false);
         isAttacking = false;
     }

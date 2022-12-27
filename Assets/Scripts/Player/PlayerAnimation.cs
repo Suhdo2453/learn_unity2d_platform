@@ -14,6 +14,7 @@ public class PlayerAnimation : MonoBehaviour
     const string PLAYER_JUMP = "jump";
     const string PLAYER_FALL = "fall";
     const string PLAYER_SLIDE = "slide";
+    const string PLAYER_BLOCK_IDLE = "block_idle";
 
     private void Start()
     {
@@ -28,6 +29,7 @@ public class PlayerAnimation : MonoBehaviour
         this.Slide();
         this.Attack();
         this.Flip();
+        this.Block();
     }
 
     protected virtual void ChangeAnimation(string newAnimation)
@@ -39,7 +41,7 @@ public class PlayerAnimation : MonoBehaviour
 
     protected virtual void Run()
     {
-        if (!playerState.isGrounded || playerState.playerAttacking.isAttacking) return;
+        if (!playerState.isGrounded || playerState.playerAttacking.isAttacking || playerState.playerBlock.isBlock) return;
 
         if (InputManager.Instance.HorizontalState != 0)
             ChangeAnimation(PLAYER_RUN);
@@ -68,7 +70,7 @@ public class PlayerAnimation : MonoBehaviour
 
     protected virtual void Flip()
     {
-        if (playerState.playerAttacking.isAttacking) return;
+        if (playerState.playerAttacking.isAttacking || playerState.playerBlock.isBlock) return;
         objectScale = transform.parent.localScale;
 
         if (InputManager.Instance.HorizontalState < 0 && objectScale.x > 0)
@@ -81,5 +83,11 @@ public class PlayerAnimation : MonoBehaviour
         }
 
         transform.parent.localScale = objectScale;
+    }
+
+    protected virtual void Block()
+    {
+        if (!playerState.playerBlock.isBlock) return;
+        ChangeAnimation(PLAYER_BLOCK_IDLE);
     }
 }

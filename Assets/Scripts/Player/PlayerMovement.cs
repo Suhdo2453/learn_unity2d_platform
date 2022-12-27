@@ -10,7 +10,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Start()
     {
-        playerState = transform.parent.GetComponent<PlayerState>();
+        playerState = transform.GetComponent<PlayerState>();
     }
 
     private void FixedUpdate()
@@ -23,8 +23,10 @@ public class PlayerMovement : MonoBehaviour
 
     protected virtual void Move()
     {
-        if (InputManager.Instance.HorizontalState == 0 || playerState.playerAttacking.isAttacking || playerState.canWallJump) return;
-        transform.parent.Translate(InputManager.Instance.HorizontalState * playerState.moveSpeed * Time.fixedDeltaTime, 0f, 0f);
+        if (InputManager.Instance.HorizontalState == 0 ||
+            playerState.playerAttacking.isAttacking ||
+            playerState.canWallJump || playerState.playerBlock.isBlock) return;
+        transform.Translate(InputManager.Instance.HorizontalState * playerState.moveSpeed * Time.fixedDeltaTime, 0f, 0f);
     }
 
 
@@ -42,7 +44,7 @@ public class PlayerMovement : MonoBehaviour
         if (!playerState.canWallJump) return;
         if (InputManager.Instance.JumpKeyPress)
         {
-            transform.parent.Translate(xWallJump * -InputManager.Instance.HorizontalState * Time.fixedDeltaTime, 0f, 0f);
+            transform.Translate(xWallJump * -InputManager.Instance.HorizontalState * Time.fixedDeltaTime, 0f, 0f);
             playerState.rb.AddForce(new Vector2(0, yWallJump));
         }
     }
