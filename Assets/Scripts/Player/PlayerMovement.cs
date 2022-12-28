@@ -5,84 +5,95 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] protected PlayerState playerState;
-    [SerializeField] protected float xWallJump = 6.5f;
-    [SerializeField] protected float yWallJump = 100f;
-    private float xStartWallJump = 0f;
-    private float xDistWallJump = 0f;
-    private bool limitVelOnWallJump;
+
+    [Header("For Movement")]
+    [SerializeField] float moveSpeed = 10f;
+    [SerializeField] float airMoveSpeed = 30f;
+
+    [Header("For Jumping")]
+    [SerializeField] float jumpForce = 16f;
+
+
+    [Header("For WallJumping")]
+    [SerializeField] float wallJumpForce = 600f;
+    [SerializeField] float wallJumpDirection = -1f;
+    [SerializeField] Vector2 wallJumpAngle;
+
+    [Header("For WallSliding")]
+    [SerializeField] float wallSlideSpeed = 0;
+    [SerializeField] float distLimitWallJump;
+    float xLimitWallJump;
+    float xOldLimitWallJump;
+    bool canMove;
+
 
     private void Start()
     {
         playerState = transform.GetComponent<PlayerState>();
+        wallJumpAngle.Normalize();
     }
 
     private void FixedUpdate()
     {
         this.Jump();
         this.WallJump();
-        this.LimitWallJump();
         this.Move();
-        this.Slide();
+        this.WallSlide();
     }
 
     protected virtual void Move()
     {
-        if (InputManager.Instance.HorizontalState == 0 ||
-            playerState.playerAttacking.isAttacking ||
-            playerState.canWallJump || playerState.playerBlock.isBlock) return;
-        transform.Translate(InputManager.Instance.HorizontalState * playerState.moveSpeed * Time.fixedDeltaTime, 0f, 0f);
+        if (playerState.playerAttacking.isAttacking || playerState.playerBlock.isBlock) return;
+        playerState.rb.velocity = new Vector2(InputManager.Instance.HorizontalState * moveSpeed, playerState.rb.velocity.y);
+        /*
+        if (playerState.isGrounded)
+        {
+            playerState.rb.velocity = new Vector2(InputManager.Instance.HorizontalState * moveSpeed, playerState.rb.velocity.y);
+        }
+        else if(!playerState.isGrounded && !playerState.IsWallSliding && InputManager.Instance.HorizontalState != 0)
+        {
+            playerState.rb.AddForce(new Vector2(airMoveSpeed * InputManager.Instance.HorizontalState, 0));
+            Debug.Log("Move");
+            if(Mathf.Abs(playerState.rb.velocity.x) > moveSpeed)
+            {
+                Debug.Log("Move 2");
+                playerState.rb.velocity = new Vector2(InputManager.Instance.HorizontalState * moveSpeed, playerState.rb.velocity.y);
+            }
+        }*/
+    }
+
+    void CheckCanMove()
+    {
+        xLimitWallJump = transform.position.x;
+        distLimitWallJump = xLimitWallJump - xOldLimitWallJump;
     }
 
 
     protected virtual void Jump()
     {
         if (!playerState.isGrounded || playerState.playerAttacking.isAttacking) return;
-        if (InputManager.Instance.JumpKeyPress && playerState.yVelocity == 0)
+        if (InputManager.Instance.JumpKeyPress)
         {
-            playerState.rb.AddForce(new Vector2(0, playerState.jumpForce));
+            playerState.rb.velocity = new Vector2(playerState.rb.velocity.x, jumpForce);
         }
     }
 
     protected virtual void WallJump()
     {
-        if (!playerState.canWallJump) return;
-        if (InputManager.Instance.JumpKeyPress)
+        if(playerState.IsWallSliding && InputManager.Instance.JumpKeyPress)
         {
-            //transform.Translate(xWallJump * -InputManager.Instance.HorizontalState * Time.fixedDeltaTime, 0f, 0f);
-            //playerState.rb.AddForce(new Vector2(0, yWallJump));
-            playerState.rb.velocity = new Vector2(0f, 0f);
-            playerState.rb.AddForce(new Vector2(-transform.localScale.x * xWallJump, yWallJump));
-            xStartWallJump = playerState.rb.position.x;
-            limitVelOnWallJump = true;
+            xOldLimitWallJump = transform.position.x;
+            playerState.rb.AddForce(new Vector2(wallJumpForce * -transform.localScale.x * wallJumpAngle.x, wallJumpForce * wallJumpAngle.y), ForceMode2D.Force);
+            playerState.isWallJump = true;
         }
     }
 
-    protected virtual void LimitWallJump()
+    protected virtual void WallSlide()
     {
-        if (!limitVelOnWallJump) return;
-
-        xDistWallJump = (xStartWallJump - transform.position.x) * transform.localScale.x;
-
-        if (xDistWallJump < -3f)
-        {
-            limitVelOnWallJump = false;
-            playerState.rb.velocity = new Vector2(0, playerState.rb.velocity.y);
-        }
-        else if (xDistWallJump > 1.5f)
-        {
-            limitVelOnWallJump = false;
-            playerState.rb.velocity = new Vector2(0, playerState.rb.velocity.y);
-        }
-    }
-
-    protected virtual void Slide()
-    {
-        if (playerState.isSliding)
+        if (playerState.IsWallSliding)
         {
             playerState.rb.velocity = new Vector2(playerState.rb.velocity.x,
-                                                Mathf.Clamp(playerState.rb.velocity.y,
-                                                -playerState.wallSlidingSpeed,
-                                                float.MaxValue));
+                                                wallSlideSpeed);
         }
     }
 }

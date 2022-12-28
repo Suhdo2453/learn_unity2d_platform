@@ -50,14 +50,14 @@ public class PlayerAnimation : MonoBehaviour
 
     protected virtual void Jump()
     {
-        if (playerState.isGrounded || playerState.isSliding) return;
+        if (playerState.isGrounded || playerState.IsWallSliding) return;
         if (playerState.isJumping) ChangeAnimation(PLAYER_JUMP);
         if (playerState.isFalling) ChangeAnimation(PLAYER_FALL);
     }
 
     protected virtual void Slide()
     {
-        if (!playerState.isSliding) return;
+        if (!playerState.IsWallSliding) return;
        
         ChangeAnimation(PLAYER_SLIDE);
     }
@@ -73,9 +73,11 @@ public class PlayerAnimation : MonoBehaviour
         if (playerState.playerAttacking.isAttacking || playerState.playerBlock.isBlock) return;
         objectScale = transform.parent.localScale;
 
-        if (InputManager.Instance.HorizontalState < 0 && objectScale.x > 0)
+        if ((InputManager.Instance.HorizontalState < 0 && objectScale.x > 0) ||
+            (playerState.isWallJump && InputManager.Instance.HorizontalState == 0))
         {
             objectScale.x *= -1;
+            playerState.isWallJump = false;
         }
         else if (InputManager.Instance.HorizontalState > 0 && objectScale.x < 0)
         {
