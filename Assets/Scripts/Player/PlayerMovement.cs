@@ -24,6 +24,13 @@ public class PlayerMovement : MonoBehaviour
     [Header("For WallSliding")]
     [SerializeField] float wallSlideSpeed = 0;
 
+    [Header("For Dash")]
+    [SerializeField] float dashSpeed;
+    [SerializeField] float dashTime;
+    [SerializeField] float dashTimeCool;
+    float m_DashTimeCounter;
+    bool m_DashCool;
+
 
     private void Start()
     {
@@ -37,6 +44,7 @@ public class PlayerMovement : MonoBehaviour
         this.WallJump();
         this.Move();
         this.WallSlide();
+        this.Dash();
     }
 
     protected virtual void Move()
@@ -88,6 +96,34 @@ public class PlayerMovement : MonoBehaviour
             playerState.rb.velocity = new Vector2(playerState.rb.velocity.x,
                                                 wallSlideSpeed);
         }
+    }
+
+    protected virtual void Dash()
+    {
+        if (!playerState.isGrounded || playerState.playerAttacking.isAttacking || playerState.playerBlock.isBlock) return;
+        if (InputManager.Instance.DashKeyPress)
+        {
+            if(m_DashTimeCounter <= 0 && !m_DashCool)
+            {
+                m_DashTimeCounter = dashTime;
+                Invoke("ResetDash", dashTimeCool);
+            }
+        }
+
+        if(m_DashTimeCounter > 0)
+        {
+            m_DashTimeCounter -= Time.fixedDeltaTime;
+            playerState.rb.velocity = new Vector2(transform.localScale.x * dashSpeed, 0f);
+            playerState.IsDash = true;
+            m_DashCool = true;
+            if (m_DashTimeCounter <= 0) playerState.IsDash = false;
+        }
+       
+    }
+
+    void ResetDash()
+    {
+        m_DashCool = false;
     }
 
     void ResetWallJump()

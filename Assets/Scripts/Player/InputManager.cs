@@ -17,6 +17,7 @@ public class InputManager : MonoBehaviour
     public bool JumpKeyPress { get => jumpKeyPress;}
     public bool AttackKeyPress { get => attackKeyPress;}
     public bool BlockKeyPress { get => blockKeyPress;}
+    public bool DashKeyPress { get => dashKeyPress; set => dashKeyPress = value; }
 
     private void Awake()
     {

@@ -8,6 +8,7 @@ public class PlayerState : ObjectState
     [SerializeField] internal bool isGrounded;
     bool isTouchingWall;
     bool isWallSliding;
+    bool isDash;
     [SerializeField] internal bool isJumping;
     [SerializeField] internal bool isSliding;
     [SerializeField] internal bool isFalling;
@@ -43,6 +44,7 @@ public class PlayerState : ObjectState
 
     public bool IsWallSliding { get => isWallSliding; set => isWallSliding = value; }
     public bool IsTouchingWall { get => isTouchingWall; set => isTouchingWall = value; }
+    public bool IsDash { get => isDash; set => isDash = value; }
 
     private void Start()
     {

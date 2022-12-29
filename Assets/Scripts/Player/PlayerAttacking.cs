@@ -28,7 +28,8 @@ public class PlayerAttacking : MonoBehaviour
         if (!InputManager.Instance.AttackKeyPress ||
             playerState.isSliding ||
             playerState.isJumping ||
-            playerState.isFalling) return;
+            playerState.isFalling ||
+            playerState.IsDash) return;
         if (!isAttacking)
         {
             currentAttack++;

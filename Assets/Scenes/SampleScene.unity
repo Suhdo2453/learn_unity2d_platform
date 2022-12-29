@@ -591,6 +591,9 @@ MonoBehaviour:
   wallJumpAngle: {x: 2, y: 7}
   wallJumpTime: 0.05
   wallSlideSpeed: -1.5
+  dashSpeed: 10
+  dashTime: 0.2
+  dashTimeCool: 1
 --- !u!114 &1324659294
 MonoBehaviour:
   m_ObjectHideFlags: 0
