@@ -15,16 +15,14 @@ public class PlayerMovement : MonoBehaviour
 
 
     [Header("For WallJumping")]
-    [SerializeField] float wallJumpForce = 600f;
+    [SerializeField] float wallJumpForceX = 600f;
+    [SerializeField] float wallJumpForceY = 800f;
     [SerializeField] float wallJumpDirection = -1f;
     [SerializeField] Vector2 wallJumpAngle;
+    [SerializeField] float wallJumpTime = 0.05f;
 
     [Header("For WallSliding")]
     [SerializeField] float wallSlideSpeed = 0;
-    [SerializeField] float distLimitWallJump;
-    float xLimitWallJump;
-    float xOldLimitWallJump;
-    bool canMove;
 
 
     private void Start()
@@ -43,9 +41,12 @@ public class PlayerMovement : MonoBehaviour
 
     protected virtual void Move()
     {
-        if (playerState.playerAttacking.isAttacking || playerState.playerBlock.isBlock) return;
-        playerState.rb.velocity = new Vector2(InputManager.Instance.HorizontalState * moveSpeed, playerState.rb.velocity.y);
-        /*
+        if (playerState.isWallJump) return;
+        if (playerState.playerAttacking.isAttacking || playerState.playerBlock.isBlock)
+        {
+            playerState.rb.velocity = Vector2.zero;
+            return;
+        }
         if (playerState.isGrounded)
         {
             playerState.rb.velocity = new Vector2(InputManager.Instance.HorizontalState * moveSpeed, playerState.rb.velocity.y);
@@ -53,19 +54,11 @@ public class PlayerMovement : MonoBehaviour
         else if(!playerState.isGrounded && !playerState.IsWallSliding && InputManager.Instance.HorizontalState != 0)
         {
             playerState.rb.AddForce(new Vector2(airMoveSpeed * InputManager.Instance.HorizontalState, 0));
-            Debug.Log("Move");
             if(Mathf.Abs(playerState.rb.velocity.x) > moveSpeed)
             {
-                Debug.Log("Move 2");
                 playerState.rb.velocity = new Vector2(InputManager.Instance.HorizontalState * moveSpeed, playerState.rb.velocity.y);
             }
-        }*/
-    }
-
-    void CheckCanMove()
-    {
-        xLimitWallJump = transform.position.x;
-        distLimitWallJump = xLimitWallJump - xOldLimitWallJump;
+        }
     }
 
 
@@ -82,8 +75,8 @@ public class PlayerMovement : MonoBehaviour
     {
         if(playerState.IsWallSliding && InputManager.Instance.JumpKeyPress)
         {
-            xOldLimitWallJump = transform.position.x;
-            playerState.rb.AddForce(new Vector2(wallJumpForce * -transform.localScale.x * wallJumpAngle.x, wallJumpForce * wallJumpAngle.y), ForceMode2D.Force);
+            playerState.rb.AddForce(new Vector2(wallJumpForceX * -transform.localScale.x * wallJumpAngle.x, wallJumpForceY * wallJumpAngle.y), ForceMode2D.Force);
+            Invoke("ResetWallJump", wallJumpTime);
             playerState.isWallJump = true;
         }
     }
@@ -95,5 +88,10 @@ public class PlayerMovement : MonoBehaviour
             playerState.rb.velocity = new Vector2(playerState.rb.velocity.x,
                                                 wallSlideSpeed);
         }
+    }
+
+    void ResetWallJump()
+    {
+        playerState.isWallJump = false;
     }
 }

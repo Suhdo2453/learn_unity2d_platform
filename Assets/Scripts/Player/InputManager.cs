@@ -10,6 +10,7 @@ public class InputManager : MonoBehaviour
     [SerializeField] protected bool jumpKeyPress;
     [SerializeField] protected bool attackKeyPress;
     [SerializeField] private bool blockKeyPress;
+    [SerializeField] private bool dashKeyPress;
 
     public static InputManager Instance { get => instance;}
     public float HorizontalState { get => horizontalState;}
@@ -27,6 +28,7 @@ public class InputManager : MonoBehaviour
     {
         this.GetHorizontalState();
         this.CheckJumpKeyPress();
+        this.CheckDashKeyPress();
     }
 
     private void FixedUpdate()
@@ -56,5 +58,11 @@ public class InputManager : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.Mouse1)) this.blockKeyPress = true;
         else this.blockKeyPress = false;
+    }
+
+    protected virtual void CheckDashKeyPress()
+    {
+        if (Input.GetKey(KeyCode.LeftShift)) this.dashKeyPress = true;
+        else this.dashKeyPress = false;
     }
 }
