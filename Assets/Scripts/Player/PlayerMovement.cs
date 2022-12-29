@@ -49,7 +49,7 @@ public class PlayerMovement : MonoBehaviour
 
     protected virtual void Move()
     {
-        if (playerState.isWallJump) return;
+        if (playerState.isWallJump || playerState.IsDash) return;
         if (playerState.playerAttacking.isAttacking || playerState.playerBlock.isBlock)
         {
             playerState.rb.velocity = Vector2.zero;
@@ -100,7 +100,14 @@ public class PlayerMovement : MonoBehaviour
 
     protected virtual void Dash()
     {
-        if (!playerState.isGrounded || playerState.playerAttacking.isAttacking || playerState.playerBlock.isBlock) return;
+        if (playerState.playerAttacking.isAttacking ||
+            playerState.playerBlock.isBlock) return;
+        if (!playerState.isGrounded)
+        {
+            m_DashTimeCounter = 0;
+            playerState.IsDash = false;
+            return;
+        }
         if (InputManager.Instance.DashKeyPress)
         {
             if(m_DashTimeCounter <= 0 && !m_DashCool)
