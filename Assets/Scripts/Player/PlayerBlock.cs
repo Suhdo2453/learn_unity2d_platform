@@ -22,7 +22,7 @@ public class PlayerBlock : MonoBehaviour
     protected virtual void Block()
     {
         if(!playerState.isGrounded || playerState.isFalling ||
-            playerState.isJumping || playerState.isSliding ||
+            playerState.isJumping || playerState.IsWallSliding ||
             playerState.playerAttacking.isAttacking)
         {
             isBlock = false;

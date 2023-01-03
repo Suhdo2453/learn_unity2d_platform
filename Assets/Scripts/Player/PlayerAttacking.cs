@@ -26,7 +26,7 @@ public class PlayerAttacking : MonoBehaviour
     protected virtual void Attack()
     {
         if (!InputManager.Instance.AttackKeyPress ||
-            playerState.isSliding ||
+            playerState.IsWallSliding ||
             playerState.isJumping ||
             playerState.isFalling ||
             playerState.IsDash) return;

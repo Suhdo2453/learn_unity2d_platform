@@ -10,7 +10,7 @@ public class EnemyAI : MonoBehaviour
     bool isHitted = false;
 
     [SerializeField]
-    float speed = 5f;
+    float speed = 2f;
 
     [SerializeField]
     float life = 10;
@@ -35,7 +35,11 @@ public class EnemyAI : MonoBehaviour
     bool endDecision = false;
     Animator anim;
 
-    string currentAnimation;
+    [SerializeField] Transform checkSensor;
+    [SerializeField] float lenghtCheckWall;
+    [SerializeField] float lenghtCheckGround;
+    bool isPlat;
+    bool isObstacle;
 
     private void Awake()
     {
@@ -46,77 +50,104 @@ public class EnemyAI : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if(life <= 0)
+        //this.MoveToTarget(enemy.transform);
+       // this.FlipWhenChangeVelX();
+        this.moveWhenNotTarget();
+    }
+
+    void MoveToTarget(Transform target)
+    {
+        if (isHitted) return;
+
+        distToPlayer = target.position.x - transform.position.x;
+        distToPlayerY = target.position.y - transform.position.y;
+
+        if (Mathf.Abs(distToPlayer) < .25f)
         {
-            //death
+            GetComponent<Rigidbody2D>().velocity = new Vector2(0, m_Rigidbody2D.velocity.y);
+            AnimationUltils.Instance.ChangeAnimation(anim, "Mushroom_Idle");
         }
-        else if(enemy != null)
+        else if (Mathf.Abs(distToPlayer) > .25f && Mathf.Abs(distToPlayer) < meleeDist)
         {
-            if (!isHitted)
+            GetComponent<Rigidbody2D>().velocity = new Vector2(0f, m_Rigidbody2D.velocity.y);
+            AnimationUltils.Instance.ChangeAnimation(anim, "Mushroom_Idle");
+
+            // nguoi choi vao vung phat hien se quay mat lai
+            if (((distToPlayer > 0f && transform.localScale.x < 0f) || (distToPlayer < 0f && transform.localScale.x > 0f)) && Mathf.Abs(distToPlayerY) < 2f)
+                Flip();
+        }
+        else if (Mathf.Abs(distToPlayer) > meleeDist && Mathf.Abs(distToPlayer) < rangeDist)
+        {
+            // di den vi tri nguoi choi de tan cong
+            m_Rigidbody2D.velocity = new Vector2(distToPlayer / Mathf.Abs(distToPlayer) * speed, m_Rigidbody2D.velocity.y);
+            AnimationUltils.Instance.ChangeAnimation(anim, "Mushroom_Run");
+        }
+        else
+        {
+            AnimationUltils.Instance.ChangeAnimation(anim, "Mushroom_Idle");
+            if (!endDecision)
             {
-                distToPlayer = enemy.transform.position.x - transform.position.x;
-                distToPlayerY = enemy.transform.position.y - transform.position.y;
+                if ((distToPlayer > 0f && transform.localScale.x < 0f) || (distToPlayer < 0f && transform.localScale.x > 0f))
 
-                if(Mathf.Abs(distToPlayer) < .25f)
-                {
-                    GetComponent<Rigidbody2D>().velocity = new Vector2(0, m_Rigidbody2D.velocity.y);
-                    ChangeAnimation("Mushroom_Idle");
-                }
-                else if(Mathf.Abs(distToPlayer) > .25f && Mathf.Abs(distToPlayer) < meleeDist && Mathf.Abs(distToPlayerY) < 2f)
-                {
-                    GetComponent<Rigidbody2D>().velocity = new Vector2(0f, m_Rigidbody2D.velocity.y);
+                    Flip();
 
-                    // nguoi choi vao vung phat hien se quay mat lai
-                    if (((distToPlayer > 0f && transform.localScale.x < 0f) || (distToPlayer < 0f && transform.localScale.x > 0f)) && Mathf.Abs(distToPlayerY) < 2f)
-                        Flip();
-                    if (canAttack)
-                    {
-                        //MeleeAttack();
-                    }
-                }
-                else if (Mathf.Abs(distToPlayer) > meleeDist && Mathf.Abs(distToPlayer) < rangeDist)
+                //if (randomDecision < 0.4f)
+                //    Run();
+                //else if (randomDecision >= 0.4f && randomDecision < 0.6f)
+                //    Jump();
+                //else if (randomDecision >= 0.6f && randomDecision < 0.8f)
+                //    StartCoroutine(Dash());
+                //else if (randomDecision >= 0.8f && randomDecision < 0.95f)
+                //    RangeAttack();
+                //else
+                //    Idle();
+            }
+            else
+            {
+                endDecision = false;
+            }
+
+        }
+    }
+
+    void moveWhenNotTarget()
+    {
+        Vector3 targetPosX = checkSensor.position;
+        Vector3 targetPosY = checkSensor.position;
+        if (!facingRight && lenghtCheckGround > 0) lenghtCheckWall *= -1;
+        else if(facingRight && lenghtCheckWall < 0) lenghtCheckWall *= -1;
+        targetPosX.x += lenghtCheckWall;
+        targetPosY.y += -lenghtCheckGround;
+
+        Debug.DrawLine(checkSensor.position, targetPosX, Color.blue);
+        isObstacle = Physics2D.Linecast(checkSensor.position, targetPosX, 1 << LayerMask.NameToLayer("Ground"));
+
+         
+        Debug.DrawLine(checkSensor.position, targetPosY, Color.blue);
+        isPlat = Physics2D.Linecast(checkSensor.position, targetPosY, 1 << LayerMask.NameToLayer("Ground"));
+
+        if (!isHitted && life > 0 && Mathf.Abs(m_Rigidbody2D.velocity.y) < 0.5f)
+        {
+            if (isPlat && !isObstacle && !isHitted)
+            {
+                if (facingRight)
                 {
-                    // di den vi tri nguoi choi de tan cong
-                    m_Rigidbody2D.velocity = new Vector2(distToPlayer / Mathf.Abs(distToPlayer) * speed, m_Rigidbody2D.velocity.y);
+                    m_Rigidbody2D.velocity = new Vector2(speed, m_Rigidbody2D.velocity.y);
                 }
                 else
                 {
-                    if (!endDecision)
-                    {
-                        if ((distToPlayer > 0f && transform.localScale.x < 0f) || (distToPlayer < 0f && transform.localScale.x > 0f))
-
-                        Flip();
-
-                        //if (randomDecision < 0.4f)
-                        //    Run();
-                        //else if (randomDecision >= 0.4f && randomDecision < 0.6f)
-                        //    Jump();
-                        //else if (randomDecision >= 0.6f && randomDecision < 0.8f)
-                        //    StartCoroutine(Dash());
-                        //else if (randomDecision >= 0.8f && randomDecision < 0.95f)
-                        //    RangeAttack();
-                        //else
-                        //    Idle();
-                    }
-                    else
-                    {
-                        endDecision = false;
-                    }
+                    m_Rigidbody2D.velocity = new Vector2(-speed, m_Rigidbody2D.velocity.y);
                 }
             }
-            else if (isHitted)
+            else
             {
-                // khi bi tan cong se chay animation va bi day ve sau
-                if ((distToPlayer > 0f && transform.localScale.x > 0f) || (distToPlayer < 0f && transform.localScale.x < 0f))
-                {
-                    Flip();
-                    //StartCoroutine(Dash());
-                }
-               // else
-                   // StartCoroutine(Dash());
+                Flip();
             }
         }
+    }
 
+    void FlipWhenChangeVelX()
+    {
         if (transform.localScale.x * m_Rigidbody2D.velocity.x > 0 && !m_FacingRight && life > 0)
         {
             // ... flip the player.
@@ -127,7 +158,6 @@ public class EnemyAI : MonoBehaviour
         else if (transform.localScale.x * m_Rigidbody2D.velocity.x < 0 && m_FacingRight && life > 0)
         {
             // ... flip the player.
-
             Flip();
         }
     }
@@ -143,10 +173,37 @@ public class EnemyAI : MonoBehaviour
         transform.localScale = theScale;
     }
 
-    protected virtual void ChangeAnimation(string newAnimation)
+    public void ApplyDamage(float damage)
     {
-        if (currentAnimation == newAnimation) return;
-        anim.Play(newAnimation);
-        currentAnimation = newAnimation;
+        if (isInvincible) return;
+
+        float direcition = damage / Mathf.Abs(damage);
+        damage = Mathf.Abs(damage);
+        AnimationUltils.Instance.ChangeAnimation(anim, "Mushroom_Hit");
+        life -= damage;
+        transform.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
+        transform.GetComponent<Rigidbody2D>().AddForce(new Vector2(direcition * 300f, 100f));
+        StartCoroutine(HitTime());
+    }
+
+    IEnumerator HitTime()
+    {
+        isInvincible = true;
+        isHitted = true;
+        yield return new WaitForSeconds(0.1f);
+        isHitted = false;
+        isInvincible = false;
+    }
+
+    public void MeleeAttack()
+    {
+        AnimationUltils.Instance.ChangeAnimation(anim, "Mushroom_Attack");
+        Collider2D[] collider2DsEnemies = Physics2D.OverlapCircleAll(attackCheck.position, 0.9f);
+        for (int i = 0; i < collider2DsEnemies.Length; i++)
+        {
+            if (collider2DsEnemies[i].gameObject.tag == "Player")
+            {
+            }
+        }
     }
 }

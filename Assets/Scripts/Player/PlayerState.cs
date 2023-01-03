@@ -5,23 +5,13 @@ using UnityEngine;
 public class PlayerState : ObjectState
 {
 
-    [SerializeField] internal bool isGrounded;
+    internal bool isGrounded;
     bool isTouchingWall;
     bool isWallSliding;
     bool isDash;
-    [SerializeField] internal bool isJumping;
-    [SerializeField] internal bool isSliding;
-    [SerializeField] internal bool isFalling;
-    [SerializeField] internal bool canWallJump;
-    [SerializeField] internal bool isWallJump;
-
-    public float moveSpeed = 5f;
-    public float jumpForce = 300f;
-    public float timeSiceAttack1 = 0.4f;
-    public float timeSiceAttack2 = 0.5f;
-    public float timeSiceAttack3 = 0.5f;
-    public float wallSlidingSpeed = 2f;
-    public float wallJumpTime = 0.08f;
+    internal bool isJumping;
+    internal bool isFalling;
+    internal bool isWallJump;
 
     [SerializeField] internal Rigidbody2D rb;
     [SerializeField] protected BoxCollider2D boxCollider2d;
