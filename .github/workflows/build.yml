@@ -38,6 +38,8 @@ jobs:
         with:
           unityVersion: 2020.3.15f2
           targetPlatform: StandaloneWindows64 
+          # adding allowDirtyBuild here fixed it for me!
+          allowDirtyBuild: true
 
       # Output 
       - uses: actions/upload-artifact@v2
